@@ -1,0 +1,74 @@
+﻿<div ng-controller="AccountRecapitulationCtrl as recapitulationCtrl" ng-if="indexCtrl.type == 'realization'" >
+    <div class="content-header" ng-show="!recapitulationCtrl.isShowingDetail">
+        Anggaran Pendapatan dan Belanja Desa (APBDes) beserta Realisasinya
+    </div>
+    <div class="content-header" ng-show="recapitulationCtrl.isShowingDetail">
+        Detail Anggaran {{recapitulationCtrl.typeBudget}} Desa {{recapitulationCtrl.RegionName}}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-condensed table-responsive table-bordered" ng-show="!recapitulationCtrl.isShowingDetail">
+            <thead>
+                <tr>
+                    <th rowspan="3" style="vertical-align: middle; width: 10%;" >Desa</th>
+                    <th rowspan="1" style="text-align: center; width: 20%;">Pendapatan</th>
+                    <th rowspan="1" style="text-align: center; width: 20%;">Pembelanjaan</th>
+                </tr>
+              </thead>
+            <tbody>
+                <tr ng-repeat="entity in entities">
+                    <td>
+                        {{entity.RegionName}}
+                    </td>
+                    <td class="money"> 
+                        <a href="#" ng-click="recapitulationCtrl.selectRecapitulations(entity.RegionId, 'i', $event); recapitulationCtrl.RegionName = entity.RegionName"    style="float:right;">
+                            {{entity.Income | number:0}}
+                        </a>
+                    </td>
+                    <td class="money">
+                        <a href="#" ng-click="recapitulationCtrl.selectRecapitulations(entity.RegionId, 'e', $event); recapitulationCtrl.RegionName = entity.RegionName" style="float:right;">
+                            {{entity.Expense | number:0}}
+                        </a>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <table class="table table-condensed table-responsive table-bordered" ng-show="recapitulationCtrl.isShowingDetail" >
+
+            @Html.Partial("TableLoader")
+
+            <thead>
+                <tr>
+                    <th rowspan="3" style="vertical-align: middle; width: 10%;">Kode</th>
+                    <th rowspan="1" style="text-align: center; width: 20%;">Nama anggaran</th>
+                    <th rowspan="1" style="text-align: center; width: 20%;">Anggaran</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="detail in details | orderBy : 'Code'" >
+                    <td >
+                        <span ng-style="{'margin-left': 5*(detail.Code.length-3)+'px'}">{{detail.Code}}</span>
+                    </td>
+                    <td> 
+                        {{detail.Name}}
+                    </td>
+                    <td class="money">
+                        <span style="float:right;">{{detail.Amount | number:0}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+       
+                  
+    </div>
+    <div class="container-fluid well help">
+        <ul>
+            <li id="help-anggaran">
+                Anggaran pendapatan desa merupakan total semua pendapatan desa, termasuk Pendapatan Asli Desa,
+                <br />
+                penyaluran dari APBN dan ADD hanyalah bagian dari total pendapatan desa ini.
+            </li>
+        </ul>
+    </div>
+</div>

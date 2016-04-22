@@ -1,0 +1,40 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".ts" #>
+<#@include file="T4Utils.t4" #>
+<#@include file="vars.t4" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+/// WARNING: T4 generated file 
+
+<#
+    foreach(var _namespace in ModelNamespaces)
+    {
+#>
+module <#=_namespace #> {
+
+<#
+		var enums = EnumerateEnums(_namespace).ToList();
+               
+		foreach (var _enum in enums) 
+		{
+
+			Indent(1); print("export enum {0}", _enum.Name); println(" {");
+			var first = true;
+			Indent(2);
+			foreach(var member in _enum.Members.OfType<CodeVariable>())
+			{
+				print(member.Prototype);
+				if(member.InitExpression != null)
+					print(" = {0}", member.InitExpression.ToString());
+				println(",");
+			}
+			Indent(1);
+			println("}");
+			println();
+
+		}
+#>
+}
+<#
+    }
+#>

@@ -1,0 +1,203 @@
+﻿@{
+
+    Layout = "_Layout.cshtml";
+}
+
+
+
+@Html.Partial("TransferRecapitulation")
+@Html.Partial("AccountRecapitulation")
+@Html.Partial("DdAllocation")
+@Html.Partial("AddAllocation")
+@Html.Partial("BhprAllocation")
+
+
+
+<script type="text/ng-template" class="modal fade" id="source-upload-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-content" ng-show="indexCtrl.newSourceState">
+        <div class="modal-body">
+            <div class="container-fluid" style="text-align: center;">
+                <img style="margin: 0 auto;" src="/Content/loading.gif" />
+                <br />
+                <br />
+                Mengunggah...
+            </div>
+        </div>
+    </div>
+    <div class="modal-content" ng-show="!indexCtrl.newSourceState">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="indexCtrl.closeModal()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title">
+                Unggah Dokumen Sumber
+            </h4>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <form class="form-horizontal">
+                    <div class="form-group" ng-class="{'has-error': indexCtrl.newSourceErrors.Function}">
+                        <label for="function" class="col-sm-3 control-label">Fungsi Dokumen</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="function" 
+                                    ng-model="indexCtrl.newSourceFunction" convert-to-number>
+                                <option value="0">Alokasi</option>
+                                <option value="1">Penyaluran</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': indexCtrl.newSourceErrors.Type}">
+                        <label for="function" class="col-sm-3 control-label">Jenis Dana</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" name="type" ng-model="indexCtrl.newSourceSubType">
+                                <option value="Dd">DD dari APBN</option>
+                                <option value="Add">ADD dari APBD</option>
+                                <option value="Bhpr">Bagi Hasil PDRD</option>
+                            </select>
+                            <div class="text-danger" ng-if="indexCtrl.newSourceErrors.Type">
+                                {{indexCtrl.newSourceErrors.Type}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': indexCtrl.newSourceErrors.fkRegionId}">
+                        <label for="name" class="col-sm-3 control-label">Wilayah</label>
+                        <div class="col-sm-9">
+                            <input type="text" ng-model="indexCtrl.newSourceRegion"
+                                   placeholder="{{indexCtrl.newSourceFunction == 0 ? 'cari kabupaten/kota atau nasional' : 'cari desa'}}"
+                                   typeahead="region as region.Name for region in indexCtrl.searchRegions($viewValue, true)" typeahead-template-url="searchTemplate.html" class="form-control" />
+                            <div class="text-danger" ng-if="indexCtrl.newSourceErrors.fkRegionId">
+                                {{indexCtrl.newSourceErrors.fkRegionId}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error': indexCtrl.newSourceErrors.File}">
+                        <label for="picture" class="col-sm-3 control-label">File</label>
+                        <div class="col-sm-9">
+                            <input type="file" ng-file-select class="form-control"
+                                   ng-model="indexCtrl.newSourceFile" multiple="" />
+                            <div class="text-danger" ng-if="indexCtrl.newSourceErrors.File">
+                                {{indexCtrl.newSourceErrors.File}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="indexCtrl.newSourceFunction == 1" 
+                         ng-class="{'has-error': indexCtrl.newSourceErrors.Amount}">
+                        <label for="amount" class="col-sm-3 control-label">Jumlah</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" input-decimal-separator="3"
+                                   ng-model="indexCtrl.newSourceAmount" multiple="" />
+                            <div class="text-danger" ng-if="indexCtrl.newSourceErrors.Amount">
+                                {{indexCtrl.newSourceErrors.Amount}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" ng-show="indexCtrl.newSourceFunction == 1"
+                         ng-class="{'has-error': indexCtrl.newSourceErrors.Date}">
+                        <label for="date" class="col-sm-3 control-label">Tanggal Penyaluran</label>
+                        <div class="col-sm-9">
+                            <div class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="dd-MM-yyyy" ng-model="indexCtrl.newSourceDate" is-open="status.opened" min-date="minDate" max-date="maxDate" close-text="Close" />
+                                <span class="input-group-addon">
+                                    <button type="button" ng-click="status.opened = true"><i class="fa fa-calendar"></i></button>
+                                </span>
+                            </div>
+                            <div class="text-danger" ng-if="indexCtrl.newSourceErrors.Date">
+                                {{indexCtrl.newSourceErrors.Date}}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div>
+                <button type="button" class="btn btn-default" ng-click="indexCtrl.closeModal()">Batal</button>
+                <button type="button" class="btn btn-primary" ng-click="indexCtrl.uploadSource()">Unggah</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<div class="btn-floating-container" ng-if="indexCtrl.hasAnyVolunteerRoles()">
+    <a href="#" class="btn btn-primary" ng-click="indexCtrl.modal('source-upload-modal', null, 'static')">
+        <i class="fa fa-upload"></i>
+    </a>
+</div>
+
+<script type="text/ng-template" id="template/datepicker/datepicker.html">
+    <div ng-switch="datepickerMode" role="application" ng-keydown="keydown($event)">
+        <daypicker ng-switch-when="day" tabindex="0"></daypicker>
+        <monthpicker ng-switch-when="month" tabindex="0"></monthpicker>
+        <yearpicker ng-switch-when="year" tabindex="0"></yearpicker>
+    </div>
+</script>
+<script type="text/ng-template" id="template/datepicker/day.html">
+    <table role="grid" aria-labelledby="{{::uniqueId}}-title" aria-activedescendant="{{activeDateId}}">
+        <thead>
+            <tr>
+                <th><button type="button" class="btn btn-default btn-sm pull-left" ng-click="move(-1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-left"></i></button></th>
+                <th colspan="{{::5 + showWeeks}}"><button id="{{::uniqueId}}-title" role="heading" aria-live="assertive" aria-atomic="true" type="button" class="btn btn-default btn-sm" ng-click="toggleMode()" ng-disabled="datepickerMode === maxMode" tabindex="-1" style="width:100%;"><strong>{{title}}</strong></button></th>
+                <th><button type="button" class="btn btn-default btn-sm pull-right" ng-click="move(1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-right"></i></button></th>
+            </tr>
+            <tr>
+                <th ng-if="showWeeks" class="text-center"></th>
+                <th ng-repeat="label in ::labels track by $index" class="text-center"><small aria-label="{{::label.full}}">{{::label.abbr}}</small></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in rows track by $index">
+                <td ng-if="showWeeks" class="text-center h6"><em>{{ weekNumbers[$index] }}</em></td>
+                <td ng-repeat="dt in row track by dt.date" class="text-center" role="gridcell" id="{{::dt.uid}}" ng-class="::dt.customClass">
+                    <button type="button" style="min-width:100%;" class="btn btn-default btn-sm" ng-class="{'btn-info': dt.selected, active: isActive(dt)}" ng-click="select(dt.date)" ng-disabled="dt.disabled" tabindex="-1"><span ng-class="::{'text-muted': dt.secondary, 'text-info': dt.current}">{{::dt.label}}</span></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/ng-template" id="template/datepicker/month.html">
+    <table role="grid" aria-labelledby="{{::uniqueId}}-title" aria-activedescendant="{{activeDateId}}">
+        <thead>
+            <tr>
+                <th><button type="button" class="btn btn-default btn-sm pull-left" ng-click="move(-1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-left"></i></button></th>
+                <th><button id="{{::uniqueId}}-title" role="heading" aria-live="assertive" aria-atomic="true" type="button" class="btn btn-default btn-sm" ng-click="toggleMode()" ng-disabled="datepickerMode === maxMode" tabindex="-1" style="width:100%;"><strong>{{title}}</strong></button></th>
+                <th><button type="button" class="btn btn-default btn-sm pull-right" ng-click="move(1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-right"></i></button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in rows track by $index">
+                <td ng-repeat="dt in row track by dt.date" class="text-center" role="gridcell" id="{{::dt.uid}}" ng-class="::dt.customClass">
+                    <button type="button" style="min-width:100%;" class="btn btn-default" ng-class="{'btn-info': dt.selected, active: isActive(dt)}" ng-click="select(dt.date)" ng-disabled="dt.disabled" tabindex="-1"><span ng-class="::{'text-info': dt.current}">{{::dt.label}}</span></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/ng-template" id="template/datepicker/popup.html">
+    <ul class="dropdown-menu" ng-if="isOpen" style="display: block" ng-style="{top: position.top+'px', left: position.left+'px'}" ng-keydown="keydown($event)" ng-click="$event.stopPropagation()">
+        <li ng-transclude></li>
+        <li ng-if="showButtonBar" style="padding:10px 9px 2px">
+            <span class="btn-group pull-left">
+                <button type="button" class="btn btn-sm btn-info" ng-click="select('today')" ng-disabled="isDisabled('today')">{{ getText('current') }}</button>
+                <button type="button" class="btn btn-sm btn-danger" ng-click="select(null)">{{ getText('clear') }}</button>
+            </span>
+            <button type="button" class="btn btn-sm btn-success pull-right" ng-click="close()">{{ getText('close') }}</button>
+        </li>
+    </ul>
+</script>
+<script type="text/ng-template" id="template/datepicker/year.html">
+    <table role="grid" aria-labelledby="{{::uniqueId}}-title" aria-activedescendant="{{activeDateId}}">
+        <thead>
+            <tr>
+                <th><button type="button" class="btn btn-default btn-sm pull-left" ng-click="move(-1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-left"></i></button></th>
+                <th colspan="3"><button id="{{::uniqueId}}-title" role="heading" aria-live="assertive" aria-atomic="true" type="button" class="btn btn-default btn-sm" ng-click="toggleMode()" ng-disabled="datepickerMode === maxMode" tabindex="-1" style="width:100%;"><strong>{{title}}</strong></button></th>
+                <th><button type="button" class="btn btn-default btn-sm pull-right" ng-click="move(1)" tabindex="-1"><i class="glyphicon glyphicon-chevron-right"></i></button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in rows track by $index">
+                <td ng-repeat="dt in row track by dt.date" class="text-center" role="gridcell" id="{{::dt.uid}}">
+                    <button type="button" style="min-width:100%;" class="btn btn-default" ng-class="{'btn-info': dt.selected, active: isActive(dt)}" ng-click="select(dt.date)" ng-disabled="dt.disabled" tabindex="-1"><span ng-class="::{'text-info': dt.current}">{{::dt.label}}</span></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>

@@ -1,0 +1,249 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".ts" #>
+<#@include file="T4Utils.t4" #>
+<#@include file="vars.t4" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+/// WARNING: T4 generated file 
+/// <reference path="../typings/angularjs/angular.d.ts"/>
+/// <reference path="Microvac.Web.ts"/>
+
+<#
+    foreach(var _namespace in ControllerNamespaces)
+    {
+#>
+module <#= _namespace #> {
+	import IQuery = Microvac.Web.IQuery;
+
+<#
+		
+		var controllers = EnumerateControllers(_namespace).ToList();
+		foreach(var _controller in controllers)
+        {
+			CodeClass modelClass = GetModel(_controller);
+			Indent(1);
+			println("export class {0}", _controller.Name);
+			println("{");
+
+			Indent(2);
+			println("public static ajaxSettings = new Microvac.Web.AjaxSettings();", _controller.Name);
+			var idType  = "number";
+			if(modelClass != null)
+            {
+				println("public dataModel : {0}.I{1} = null;", modelClass.Namespace.FullName, modelClass.Name);
+				println();
+				print("constructor(data?: {0}.I{1})", modelClass.Namespace.FullName, modelClass.Name); 
+				println(" {");
+				Indent(3);
+				println("this.dataModel = data;");
+				Indent(2);
+				println("}");
+			    idType = GetModelIdType(modelClass);
+            }
+						
+			if(modelClass != null && IsReadOnlyController(_controller))
+            {			
+	#>
+		static GetAll(query?: IQuery): ng.IHttpPromise<Array<<#= modelClass.Namespace.FullName+".I" + modelClass.Name #>>> {
+			var res = Microvac.Web.$http<Array<<#= modelClass.Namespace.FullName+".I" + modelClass.Name #>>>(<#= _controller.Name #>.ajaxSettings.build({
+				method: 'GET',
+				url: '/api/<#= GetRouteName(_controller.Name) #>/GetAll',
+				params: query,
+			}));
+			return res;
+		}
+
+		static Get(id: <#= idType #>): ng.IHttpPromise<<#= modelClass.Namespace.FullName+".I" + modelClass.Name #>> {
+			var res = Microvac.Web.$http<<#= modelClass.Namespace.FullName+".I" + modelClass.Name #>> (<#= _controller.Name #>.ajaxSettings.build({
+			method: 'GET',
+			url: '/api/<#= GetRouteName(_controller.Name) #>/Get/'+id,
+			}));
+			return res;
+		}
+
+		static Count(query?: IQuery): ng.IHttpPromise<number> {
+			var res = Microvac.Web.$http<number>(<#= _controller.Name #>.ajaxSettings.build({
+				method: 'GET',
+				url: '/api/<#= GetRouteName(_controller.Name) #>/GetCount',
+				data: query,
+			}));
+			return res;
+		}
+	<#
+            }
+
+
+			if(modelClass != null && IsCrudController(_controller))
+            {				
+	#>	
+		static Save(model: <#= modelClass.Namespace.FullName+".I" + modelClass.Name #>): ng.IHttpPromise<<#= idType #>> {
+			var isNew = model.Id == null;
+            var res = Microvac.Web.$http<<#= idType #>>(<#= _controller.Name #>.ajaxSettings.build({
+                 method: isNew ? 'POST' : 'PUT',
+				 url: '/api/<#= GetRouteName(_controller.Name) #>/'+(isNew ? 'Post' : 'Put'),
+				 data: JSON.stringify(model)
+            }));
+            return res;
+        }
+
+		static Delete(id: <#= idType #>): ng.IHttpPromise<void> {
+				var res = Microvac.Web.$http<void>(<#= _controller.Name #>.ajaxSettings.build({
+					method: 'GET',
+					url: '/api/<#= GetRouteName(_controller.Name) #>/Delete/'+id,
+				}));
+				return res;
+		}
+	<#
+            }
+
+			foreach(var member in EnumerateTSMembers(_controller)
+                .Where(x => x.Kind == vsCMElement.vsCMElementFunction)) 
+            {
+				if(member.Name == _controller.Name || (modelClass != null 
+					&& ControllerIgnoredFunctions.Contains(member.Name)))
+                    continue;
+
+				var fct = (CodeFunction)member;
+				var tresult = GetReturnType(fct, true);
+				var method = GetMethod((CodeElement)member, true);
+				var isMultipart = false;
+				var multipartName = "multipart";
+				var url = string.Format("/api/{0}/{1}", GetRouteName(_controller.Name), member.Name);
+                var sb = new StringBuilder("");
+				bool first = true;
+
+					for(int i = 0; i<fct.Parameters.Count; i++)
+                    {
+						var p = (CodeParameter)fct.Parameters.Item(i+1);
+						
+						if (HasAttribute((CodeElement)p, xa => xa.Name == "FromBody"))
+							continue;
+
+						var pt = GetTSType(p);
+						
+						if(pt == "Microvac.Web.Multipart")
+						{
+							isMultipart = true;
+							multipartName = p.Name;
+							continue;
+						}
+
+						sb.Append(first ? "?" : "&");
+						first = false;
+						
+						if (pt == "string")
+							sb.AppendFormat("{0}='+encodeURI({0})+'", p.Name);
+
+						else
+							sb.AppendFormat("{0}='+{0}+'", p.Name);
+
+					}
+
+				url += sb.ToString();
+				println("");
+				var hasFromBodyAndSameClass = false;
+				for (int i = 0; i<fct.Parameters.Count; i++) 
+                {
+					var p = (CodeParameter)fct.Parameters.Item(i+1);
+                    if (HasAttribute((CodeElement)p, xa => xa.Name == "FromBody")) {
+                        var pt = GetTSType(p);
+                        if(p.Type.AsString == _controller.FullName)
+                            hasFromBodyAndSameClass = true;
+                    }
+                }
+
+				if(!hasFromBodyAndSameClass)
+                {
+					Indent(2);
+                    print("static ");
+                }
+
+				print("{0}(", fct.Name); 
+				for (int i = 0; i<fct.Parameters.Count; i++) 
+                {
+					var p = (CodeParameter)fct.Parameters.Item(i+1);
+					if (HasAttribute((CodeElement)p, xa => xa.Name == "FromBody")) {
+                        if(hasFromBodyAndSameClass)
+                            continue;
+                    }
+
+					if (i>0)
+                        print(", ");
+
+					if (HasAttribute((CodeElement)p, xa => xa.Name == "FromBody")) {
+                        if(hasFromBodyAndSameClass)
+                            continue;
+
+                        print("/** [FromBody] **/");
+                    }
+
+					var pt = GetTSType(p);
+                    print("{0}: {1}", p.Name, pt);
+                }
+
+				if(!isMultipart)
+				{
+					print("): ng.IHttpPromise<{0}> ", tresult); 
+					println("{");
+	#>
+			var res = Microvac.Web.$http<<#= tresult #>>(<#= _controller.Name #>.ajaxSettings.build({
+			method: '<#= method #>',
+			url: '<#= url #>',
+	<# 
+					for (int i = 0; i<fct.Parameters.Count; i++) 
+                    {
+						var p = (CodeParameter)fct.Parameters.Item(i+1);
+						if (HasAttribute((CodeElement)p, xa => xa.Name == "FromBody")) 
+                        {
+							if (method == "GET") {
+                                println("error: GET methods don't support FromBody parameters.");
+                            }
+
+							else {
+                                Indent(3);
+                                print("data: JSON.stringify(");
+                                if(hasFromBodyAndSameClass)
+                                {
+                                    print("this");
+                                }
+                                else 
+                                {
+                                    print(p.Name);
+                                }
+                                println("),");
+                            }
+
+							break;
+                        }
+                    }
+	#>
+			}));
+	<#
+                }
+
+				else
+				{
+					println("): any  {");
+	#>
+			var res = <#= multipartName #>.upload('<#= url #>');
+	<#
+                }
+
+	#>
+		   return res;
+	<#
+				Indent(1); 
+				println("}");
+            }
+
+			
+#>
+	}
+<#
+			println();
+        }
+#>
+}
+<#
+}
+#>

@@ -1,0 +1,131 @@
+﻿<div ng-controller="BhprAllocationCtrl as allocationCtrl" ng-if="indexCtrl.type == 'bhpr' && indexCtrl.guessedRegionType < 4">
+
+    <div class="alert alert-success" style="font-size: small; padding: 5px 20px;">
+        <b>Bagi Hasil Pajak &amp; Retribusi untuk desa</b>
+        adalah pendapatan desa yang dialokasikan Pemerintah kabupaten/kota dari hasil pajak dan retribusi daerah kabupaten/kota,
+        <a href="#" ng-click="showMore=true;" class="btn btn-default btn-xs" ng-show="!showMore">selengkapnya...</a>
+        <span ng-show="showMore">
+            yang paling sedikit 10% dari realisasi penerimaan hasil pajak dan retribusidaerah kabupaten/kota .
+            (Sumber: <a href="#">PP No. 43 tahun 2014</a>)
+        </span>
+        <br />
+    </div>
+
+    <div class="content-header">
+        Pagu Bagi Hasil Pajak &amp; Retribusi dari APBD-P
+        <select ng-model="indexCtrl.yearSelected"
+                ng-options="Year.year for Year in indexCtrl.years"
+                ng-change="indexCtrl.changeYear('bhpr', indexCtrl.regionId);allocationCtrl.getBundle(indexCtrl.regionId)"></select>
+    </div>
+
+    @Html.Partial("DocumentUploadSource")
+
+    <div class="table-responsive">
+        <table class="table table-condensed table-responsive table-bordered">
+            <thead ng-show="!isEntitiesLoading">
+                <tr ng-if="indexCtrl.region.Type < 2">
+                    <th style="vertical-align: middle;">{{indexCtrl.childName}}</th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">Pajak Daerah</th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">Retribusi Daerah</th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">Total Bagi Hasil Pajak &amp; Retribusi</th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">% Total Bagi Hasil Pajak / (Pajak + Retribusi Daerah) <a href="#help-target">?</a></th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">Jumlah Desa</th>
+                    <th class="money" style="width: 10%; vertical-align: middle; text-align: center;">Rata-rata Bagi Hasil</th>
+                </tr>
+                <tr ng-if="indexCtrl.region.Type >= 2">
+                    <th style="vertical-align: middle;" rowspan="2">{{indexCtrl.childName}}</th>
+                    <th style="vertical-align: middle;" class="money" rowspan="2">Alokasi Merata</th>
+                    <th colspan="4" style="text-align: center;">Alokasi Proporsional</th>
+                    <th style="vertical-align: middle;" class="money" rowspan="2" >Bagi Hasil Pajak yang Diterima Desa</th>
+                </tr>
+                <tr ng-if="indexCtrl.region.Type >= 2">
+                    <th class="money">Realisasi PDRD Desa</th>
+                    <th class="money">Realisasi PDRD Seluruh Desa</th>
+                    <th class="money">% Realisasi PDRD Desa / Seluruh Desa</th>
+                    <th class="money">Alokasi Proporsional</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="entity in entities | orderBy : 'RegionName'" ng-if="indexCtrl.region.Type < 2">
+                    <td>
+                        <a ng-if="indexCtrl.guessType(entity.RegionId) < 4" href="/bhpr/{{entity.RegionId}}" ng-click="indexCtrl.changeRegion(entity.RegionId, $event)">
+                            <span ng-show="entity.TotalDesa == 0" style="text-decoration:line-through">
+                                {{entity.RegionName}}
+                            </span>
+                            <span ng-show="entity.TotalDesa != 0">
+                                {{entity.RegionName}}
+                            </span>
+                        </a>
+                        <span ng-if="indexCtrl.guessType(entity.RegionId) == 4">
+                            {{entity.RegionName}}
+                        </span>
+                    </td>
+                    <td class="money"> {{entity.RegionalTax | number:0}} </td>
+                    <td class="money"> {{entity.RegionalRetribution | number:0}} </td>
+                    <td class="money"> {{entity.Bhpr | number:0}} </td>
+                    <td class="money"> {{entity.Bhpr / (entity.RegionalTax + entity.RegionalRetribution) * 100 | number:0}}</td>
+                    <td class="money"> {{entity.TotalDesa | number:0}} </td>
+                    <td class="money"> {{entity.Bhpr / entity.CompletedDesa | number:0}} </td>
+                </tr>
+                <tr ng-repeat="entity in entities | orderBy : 'RegionName'" ng-if="indexCtrl.region.Type >= 2">
+                    <td>
+                        <a ng-if="indexCtrl.guessType(entity.RegionId) < 4" href="/bhpr/{{entity.RegionId}}" ng-click="indexCtrl.changeRegion(entity.RegionId, $event)">
+                            <span ng-show="entity.TotalDesa == 0" style="text-decoration:line-through">
+                                {{entity.RegionName}}
+                            </span>
+                            <span ng-show="entity.TotalDesa != 0">
+                                {{entity.RegionName}}
+                            </span>
+                        </a>
+                        <span ng-if="indexCtrl.guessType(entity.RegionId) == 4">
+                            <span ng-show="entity.TotalDesa == 0" style="text-decoration:line-through">
+                                {{entity.RegionName}}
+                            </span>
+                            <span ng-show="entity.TotalDesa != 0">
+                                {{entity.RegionName}}
+                            </span>
+                        </span>
+                    </td>
+                    <td class="money"> {{entity.BaseAllocation | number:0}}</td>
+                    <td class="money"> {{entity.Pdrd | number:0}}</td>
+                    <td class="money"> {{total.Pdrd | number:0}}</td>
+                    <td class="money"> {{entity.PdrdRatio | number:0}}</td>
+                    <td class="money"> {{entity.FormulaBasedAllocation | number:0}}</td>
+                    <td class="money"> {{entity.Bhpr | number:0}}</td>
+                </tr>
+            </tbody>
+            <tfoot ng-show="!isEntitiesLoading">
+                <tr class="success" ng-if="indexCtrl.region.Type < 2">
+                    <td><a href="">Total</a></td>
+                    <td class="money"> {{total.RegionalTax | number:0}} </td>
+                    <td class="money"> {{total.RegionalRetribution | number:0}} </td>
+                    <td class="money"> {{total.Bhpr | number:0}} </td>
+                    <td class="money"> {{total.Bhpr / (total.RegionalTax + total.RegionalRetribution) * 100 | number:0}}</td>
+                    <td class="money"> {{total.TotalDesa | number:0}} </td>
+                    <td class="money"> {{total.Bhpr / total.CompletedDesa | number:0}} </td>
+                </tr>
+                <tr class="success" ng-if="indexCtrl.region.Type >= 2">
+                    <td><a href="">Total</a></td>
+                    <td class="money"> {{total.BaseAllocation | number:0}}</td>
+                    <td class="money"> {{total.Pdrd | number:0}}</td>
+                    <td class="money"> {{total.Pdrd | number:0}}</td>
+                    <td class="money"> {{total.PdrdRatio | number:0}}</td>
+                    <td class="money"> {{total.FormulaBasedAllocation | number:0}}</td>
+                    <td class="money"> {{total.Bhpr | number:0}}</td>
+                </tr>
+            </tfoot>
+
+            @Html.Partial("TableLoader")
+
+        </table>
+    </div>
+
+    <div class="container-fluid well help">
+        <ul>
+            <li id="help-target">
+                Menurut PP No. 43 tahun 2015 Pasal 97, Bagi Hasil Pajak untuk desa paling sedikit 10% dari realisasi penerimaan hasil pajak dan retribusidaerah kabupaten/kota .
+            </li>
+        </ul>
+    </div>
+
+</div>

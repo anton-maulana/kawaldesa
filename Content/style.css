@@ -1,0 +1,408 @@
+
+.bar-percent {
+    height: 16px;
+    background-color: #337ab7;
+    opacity: 0.3;
+    right:0;
+    position:absolute;
+    max-width: 100%;
+}
+
+.bar-percent .bar-percent-light {
+    background-color: lightblue;
+}
+
+.table > tbody > tr:hover .bar-percent {
+    background-color: red !important;
+}
+
+tr {
+    font-size: 12px;
+}
+
+html {
+    font-family: "Lato",sans-serif !important;
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Lato",sans-serif !important;
+    line-height: 20px;
+    margin-top: 70px;
+    min-height: 100%;
+}
+
+    body h1, body h2, body h3, body h4, body h5, body h6, body .h1, body .h2, body .h3, body .h4, body .h5, body .h6 {
+        color: inherit;
+        font-family: "Lato",sans-serif !important;
+        font-weight: bold;
+        text-rendering: optimizelegibility;
+    }
+
+header {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: -2px 0px 3px 0px rgba(0,0,0,0.5);
+    border-bottom: 1px solid #337ab7;
+}
+
+    header .nav.nav-menu {
+        margin-left: 0px;
+        margin-right: 30px;
+    }
+
+    header .nav.navbar-nav > li > a {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    header .nav.navbar-nav > li.active > a {
+        padding-top: 11px;
+        border-top: 4px solid #337ab7;
+    }
+
+    header .nav.navbar-nav > li > a:hover {
+        padding-top: 11px;
+        border-top: 4px solid #337ab7;
+    }
+
+    header .nav.navbar-nav > li > div.gt {
+        color: #337ab7;
+        font-size: 20px;
+        padding: 13px 0px;
+    }
+
+    header.navbar .nav-region {
+        margin-left: 30px;
+    }
+
+    header.navbar .navbar-brand {
+        margin-right: 10px;
+        padding: 15px 10px;
+        background-color: #337ab7; 
+        color: #fff;
+    }
+
+    header.navbar .navbar-header button {
+        color:  #337ab7;
+    }
+
+    header.navbar .navbar-header button .icon-bar{
+        background-color:  #337ab7;
+    }
+
+    header.navbar .navbar-brand {
+        margin-right: 10px;
+        padding: 15px 10px;
+        background-color: #337ab7; 
+        color: #fff;
+    }
+
+    header.navbar nav.navbar-collapse {
+        padding-right: 150px;
+    } 
+
+    header.navbar nav .nav-region {
+        margin-left: -10px; 
+        font-size: 11px;
+    }  
+
+    header.navbar nav .navbar-right{
+        position: absolute; 
+        right: 20px; 
+        top: 0;
+    }  
+
+    header.navbar nav .navbar-right i.fa-search{
+        line-height: 20px;
+    }  
+
+    header.navbar nav .navbar-right .nav-profile{
+    }  
+
+    header.navbar nav .navbar-right .nav-profile img {
+        width: 20px; 
+        height: 20px; 
+        margin-right: 5px; 
+    }  
+
+    header.navbar nav .navbar-right .nav-profile ul i.fa {
+        width: 20px;
+    }  
+
+    header.navbar .navbar-right .search-input-group {
+        width: 375px;
+    }  
+
+    header.navbar  form.navbar-right {
+        position: absolute; 
+        right: 100px; 
+        border-left: 1px solid #ccc; 
+        border-right: 1px solid #ccc; 
+        background-color: #fff;
+        display: block;
+    }  
+
+    header.navbar  form.navbar-right.collapse {
+        display: none;
+    }  
+
+    @media (min-width: 768px) {
+        header.navbar  .navbar-header form {
+            display: none;
+        }  
+        header.navbar  .navbar-right .btn-search {
+            margin-left: 5px;
+        }  
+    }
+    @media (max-width: 768px) {
+        header.navbar  .navbar-header form .btn {
+            color: white;
+        }
+        header.navbar .navbar-header {
+            background-color: white; 
+        }
+        header.navbar nav.navbar-collapse {
+            background-color: rgba(255, 255, 255, 0.9); 
+            min-height: 100%; 
+            overflow: scroll;
+            position: fixed; 
+            left: 0px; 
+            top: 50px;
+            width: 250px;
+            padding: 10px 0px 10px 20px;
+            border-right: 1px solid #337ab7;
+        }  
+        header nav .nav.navbar-nav {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+        header .nav.navbar-nav > li > a {
+            padding: 5px 10px;
+        }
+        header .nav.navbar-nav > li.active > a {
+            border-top: 0;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+        header .nav.navbar-nav > li:hover > a {
+            border-top: 0;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        header.navbar  form.navbar-right {
+            display: none;
+        }  
+        header.navbar  .navbar-right .btn-search {
+            display: none;
+        }  
+        header.navbar .navbar-nav {
+            border-bottom: 1px solid #ccc;
+        }
+        header.navbar nav .navbar-right{
+            position: static; 
+            right: 0; 
+        }  
+        header.navbar .dropdown-menu {
+            display: block;
+            background-color: transparent;
+            border: 0 none;
+            box-shadow: none;
+            float: none;
+            margin-top: 0;
+            position: static;
+            width: auto;
+        }  
+
+        header.navbar .dropdown-menu li a {
+            padding: 5px 10px 5px 20px;
+            color: #337ab7;
+        }  
+
+        header.navbar .dropdown-menu.open li.active a,
+        header.navbar .dropdown-menu li.active a,
+        header.navbar .dropdown-menu.open li:hover a,
+        header.navbar .dropdown-menu li:hover a
+         {
+            color: #337ab7;
+            font-weight: bold;
+        }  
+
+        header.navbar .dropdown-menu.open li.active a,
+        header.navbar .dropdown-menu li.active a
+         {
+            background-color: transparent;
+        }  
+
+        header.navbar .dropdown-toggle span.caret {
+            display: none;
+        }  
+
+        header.navbar .navbar-form {
+            border: 0;
+        }  
+
+        header.navbar .navbar-form .input-group-addon, .input-group-btn{
+            vertical-align: top;
+        }  
+    }
+
+table.table > thead > tr > th:first-child,
+table.table > tbody > tr > td:first-child,
+table.table > tfoot > tr > td:first-child {
+    padding-left: 10px;
+}
+
+table.table > tfoot > tr > td:last-child,
+table.table > thead > tr > th:last-child,
+table.table > tbody > tr > td:last-child {
+    padding-right: 10px;
+}
+
+table.table > tfoot > tr > td {
+    font-weight: 700;
+}
+
+.content-header, tr.content-header {
+    border-top: 1px solid #337ab7;
+    border-bottom: 1px solid #337ab7;
+    color: #337ab7;
+    text-transform: uppercase;
+    padding: 0 0 0 10px;
+    font-size: 14px;
+}
+
+th.money, td.money {
+    text-align: right;
+    position:relative;
+}
+
+td.money {
+    font-family: 'Consolas','Consolata',monospace;
+}
+
+div.insert {
+    text-align: right;
+    text-transform: none;
+    float: right;
+    margin-right: 20px;
+}
+
+    div.insert a {
+        font-family: "Lato",sans-serif !important;
+        font-style: italic;
+        text-decoration: underline;
+    }
+
+/* Fix th borders*/
+.table.table-bordered th {
+    border-bottom: 0;
+}
+
+table.table-bordered > thead > tr > th:first-child,
+table.table-bordered > thead > tr > th:last-child {
+    border-right: 0;
+}
+
+.table.table-bordered thead tr:last-child th {
+    border-bottom: 1px solid #ddd;
+}
+
+.table.table-bordered thead tr:first-child th:first-child {
+    border-bottom: 1px solid #ddd;
+}
+/* End Fix th borders*/
+
+.table-condensed > thead > tr > th, .table-condensed > tbody > tr > th, .table-condensed > tfoot > tr > th, .table-condensed > thead > tr > td, .table-condensed > tbody > tr > td, .table-condensed > tfoot > tr > td {
+    padding: 3px;
+}
+
+
+.table > tbody > tr:hover {
+    background-color: rgb(222, 230, 241);
+}
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+.btn-floating-container {
+    position: fixed;
+    bottom: 45px; 
+    right: 24px; 
+    z-index: 1000;
+}
+
+.btn-floating-container .btn {
+    border-radius: 50%; 
+    line-height: 55.5px; 
+    font-size: 1.6rem; 
+    height: 55px; 
+    width: 55px; 
+    position: relative; 
+    display: inline-block; 
+    padding: 0; 
+    transition: all 0.3s ease 0s; 
+    vertical-align: middle; 
+    text-align: center; 
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.btn-floating-container .btn i{
+    line-height: 55.5px; 
+    font-size: 2rem; 
+    text-align: center;
+}
+
+.navbar-form {
+    border-left: 1px solid #ccc;
+    border-radius: 4px;
+    border-right: 1px solid #ccc;
+    box-shadow: -2px 0 3px 0 rgba(0, 0, 0, 0.18);
+    margin-bottom: -9px;
+    margin-top: 4px;
+    padding-bottom: 4px;
+    padding-top: 7px;
+}
+
+.alert {
+    border-radius: 0px;
+}
+.well {
+    border-radius: 0px;
+}
+
+.front-numbers {
+}
+.front-numbers li {
+    margin-top: -10px;
+    margin-right: 40px;
+    margin-bottom: 10px;
+}
+.front-numbers li .number{
+    padding: 5px;
+    font-size: 30px;
+    line-height: 32px;
+    display: inline-block;
+}
+.front-numbers li .text{
+    display: inline-block;
+    width: 50px;
+    font-size: 12px;
+    text-transform: uppercase;
+    line-height: 13px;
+}
+
+footer ul {
+    padding-left: 0;
+}
+
+footer ul.nav > li {
+    display: inline;
+}
+
+footer ul.nav > li a {
+    display: inline;
+}
+

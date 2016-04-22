@@ -1,0 +1,5 @@
+job1:
+  script: 
+    - "bash -c 'nuget restore'"
+    - "bash -c 'msbuild KawalDesa.sln'"
+    - "ssh Administrator@win1.microvac.co.id '~/aspdeployer/instances/kawaldesa.sh --force'"

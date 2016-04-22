@@ -1,0 +1,116 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".ts" #>
+<#@include file="T4Utils.t4" #>
+<#@include file="vars.t4" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+/// WARNING: T4 generated file 
+/// <reference path="Microvac.Web.ts"/>
+
+<#
+    foreach(var _namespace in ModelNamespaces)
+    {
+#>
+module <#=_namespace #> {
+
+	import IQuery = Microvac.Web.IQuery;
+<#
+	var clses = EnumerateModels(_namespace).ToList();
+    var jsoncls  = clses.OrderBy(_class => _class.Bases.Cast<CodeElement>()
+                .Where(x => clses.Select(c => c.Name).Contains(x.Name))
+                .Count()).ToList();       
+          
+	foreach (var _class in jsoncls) 
+	{
+		println("");
+
+		var elem = (CodeElement)_class;
+		Indent(1);
+
+        print("export interface {0}{1}", "I", _class.Name); 
+        var bases =  _class.Bases.Cast<CodeElement>().Where(x => jsoncls.Select(c => c.Name).Contains(x.Name)).ToList();
+        var allMembers = EnumerateTSMembers(_class).ToList();
+
+        if (bases.Count > 0)
+        {
+            bool first = true;
+            foreach (var super in bases)
+            {
+				print(first ? " extends " : ", ");
+                first = false;
+				print("I" + super.Name);
+            }
+        }
+
+		println(" {");
+        Indent(2);
+
+        foreach(var member in allMembers)
+        {
+            if (member.Kind == vsCMElement.vsCMElementProperty)
+            {
+                var p = (CodeProperty)member;
+                println("{0}: {1};", GetTSName(p), GetTSType(p));
+            }
+        }
+		Indent(1);
+		println("}");
+		
+        println();
+
+		print("export class {0}", _class.Name); 
+        if (bases.Count > 0)
+        {
+            bool first = true;
+            foreach (var super in bases)
+            {
+                print(first ? " extends " : ", ");
+                first = false;
+                print(super.Name);
+            }
+        }
+        println(" {");
+		Indent(2);
+		println("public static ajaxSettings = new Microvac.Web.AjaxSettings();", _class.Name); 
+		println();
+		foreach(var member in allMembers) 
+		{
+			if (member.Kind == vsCMElement.vsCMElementProperty)
+            {
+				var p = (CodeProperty)member;
+				println("{0}: {1};", GetTSName(p), GetTSType(p));
+            }
+		}
+		println();
+		print("constructor(data?: I{0})",  _class.Name); 
+		println(" {");
+
+		Indent(3);
+
+        if (bases.Count > 0)
+        {
+            println("super(data);");
+        }
+        foreach(var member in allMembers) 
+		{
+			if (member.Kind == vsCMElement.vsCMElementProperty)
+            {
+				var p = (CodeProperty)member;
+				println("this.{0} = data ? data.{0} : null;", GetTSName(p), GetTSDefault(p));
+            }
+		}
+		Indent(2);
+		println("}");
+        var idType = GetModelIdType(_class);
+
+		println("");
+		Indent(1); 
+		println("}");
+		println("");
+
+	}
+#>
+}
+<#
+    }
+#>
